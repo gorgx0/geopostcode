@@ -13,6 +13,10 @@ function recalculatePostalCodesList() {
             }
         })
     })
+    $('#codesListContainerList').empty()
+    postCodes.forEach(function (postCode) {
+        $('#codesListContainerList').append('<li>'+postCode+'</li>')
+    })
 }
 
 function findPostalCode(markerStructure) {
