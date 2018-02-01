@@ -1,8 +1,21 @@
 var map;
 var markers = new Array();
-var geocoder
+var postCodes = new Array()
+function recalculatePostalCodesList() {
+    console.log('--- recalculatePostalCodesList ---')
+    markers.forEach(function (markerStructure) {
+        console.log(markerStructure.marker.position.lat())
+        console.log(markerStructure.marker.position.lng())
+        console.log(markerStructure.postCodes)
+        markerStructure.postCodes.forEach(function (postalCode) {
+            if(!_.contains(postCodes, postalCode)){
+                postCodes.push(postalCode)
+            }
+        })
+    })
+}
 
-function findPostalCode(latLng) {
+function findPostalCode(markerStructure) {
     console.log('find postal code for position')
     radius = parseInt($('#radiusInput').val());
     $.get(
@@ -11,19 +24,21 @@ function findPostalCode(latLng) {
             username: 'gorgx0',
             radius: radius/1000 ,
             maxRows: 20,
-            lat: latLng.lat(),
-            lng: latLng.lng()
+            lat: markerStructure.marker.position.lat(),
+            lng: markerStructure.marker.position.lng()
         },
         function (data,status,jqXHRobj) {
             console.log('--- geoname results ---');
             console.log(data);
             data.postalCodes.forEach(function (postalCodeItem) {
                 console.log(postalCodeItem.postalCode)
+                markerStructure.postCodes.push(postalCodeItem.postalCode)
             })
             console.log(status);
             console.log(jqXHRobj);
+            recalculatePostalCodesList()
         }
-    );
+);
 }
 
 function initMap() {
@@ -36,10 +51,15 @@ function initMap() {
         var marker = new google.maps.Marker({
             position: e.latLng,
             map: map,
-            title: 'a Marker'
+            title: 'r='+$('#radiusInput').val()+' m'
         });
-        markers.push(marker)
-        findPostalCode(e.latLng)
+        var markerStructure = {
+            marker: marker,
+            radius: $('#radiusInput').val(),
+            postCodes : new Array()
+        }
+        markers.push(markerStructure)
+        findPostalCode(markerStructure)
     })
 }
 
