@@ -36,20 +36,20 @@
     </nav>
 
 
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col">
-          <div id="map_canvas">Map here</div>
+    <div class="container" id="mapa">
+        <div id="map_canvas">Map here</div>
+        <div id="radius" class="form-group">
+            <label for="radius">radius(m)</label>
+            <input name="radius" id="radiusInput" type="number">
         </div>
-      </div>
-    </div> <!-- /container -->        
+    </div> <!-- /container -->
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
 
     <script src="js/vendor/bootstrap.min.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACNmxE04ekYyCQ49q7Rgo-_z1Lu-1oQJA&callback=initMap"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js" integrity="sha256-obZACiHd7gkOk9iIL/pimWMTJ4W/pBsKu+oZnSeBIek=" crossorigin="anonymous"></script>
     <script src="js/main.js"></script>
     </body>
 </html>

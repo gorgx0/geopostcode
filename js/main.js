@@ -4,11 +4,12 @@ var geocoder
 
 function findPostalCode(latLng) {
     console.log('find postal code for position')
+    radius = parseInt($('#radiusInput').val());
     $.get(
         'http://api.geonames.org/findNearbyPostalCodesJSON',
         {
             username: 'gorgx0',
-            radius: '0.2',
+            radius: radius/1000 ,
             maxRows: 20,
             lat: latLng.lat(),
             lng: latLng.lng()
@@ -23,18 +24,15 @@ function findPostalCode(latLng) {
             console.log(jqXHRobj);
         }
     );
-    // http://api.geonames.org/findNearbyPostalCodesJSON?username=gorgx0&lat=52.2304&lng=21.0116&radius=0.1
 }
 
 function initMap() {
-    geocoder = new google.maps.Geocoder ;
     map = new google.maps.Map(document.getElementById('map_canvas'), {
         center: {lat: 52.2304, lng: 21.0116},
         zoom: 13,
         draggableCursor: 'pointer'
     });
     map.addListener('click', function (e) {
-        console.log('lat: '+e.latLng.lat()+' lng:'+e.latLng.lng());
         var marker = new google.maps.Marker({
             position: e.latLng,
             map: map,
@@ -44,3 +42,16 @@ function initMap() {
         findPostalCode(e.latLng)
     })
 }
+
+$(function () {
+    $('#radiusInput').keyup(function (e) {
+        radiusVal = $('#radiusInput').val()
+        radius = Number(radiusVal)
+        if(isNaN(radius)) {
+            $('#radiusInput').addClass('validationError')
+        }else{
+            $('#radiusInput').removeClass('validationError')
+        }
+    });
+
+})
