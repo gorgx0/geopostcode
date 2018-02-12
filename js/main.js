@@ -57,6 +57,17 @@ function initMap() {
             map: map,
             title: 'r='+$('#radiusInput').val()+' m'
         });
+        marker.addListener("click", function (e) {
+            console.log("Marker clicked: ")
+            console.log(e)
+            console.log(this)
+            markers = _.reject(markers, function (markerStructure) {
+                return markerStructure.marker == this;
+            });
+            this.setMap(null)
+            recalculatePostalCodesList();
+        })
+
         var markerStructure = {
             marker: marker,
             radius: $('#radiusInput').val(),
