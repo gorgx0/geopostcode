@@ -1,11 +1,9 @@
 var map;
 var markers = new Array();
-var postCodes = new Array()
 function recalculatePostalCodesList() {
+    var postCodes = new Array()
     console.log('--- recalculatePostalCodesList ---')
     markers.forEach(function (markerStructure) {
-        console.log(markerStructure.marker.position.lat())
-        console.log(markerStructure.marker.position.lng())
         console.log(markerStructure.postCodes)
         markerStructure.postCodes.forEach(function (postalCode) {
             if(!_.contains(postCodes, postalCode)){
@@ -57,6 +55,16 @@ function initMap() {
             map: map,
             title: 'r='+$('#radiusInput').val()+' m'
         });
+        marker.addListener("click", function (e) {
+            console.log("Marker clicked: ")
+            markers = _.reject(markers, function (markerStructure) {
+                let same = markerStructure.marker.getPosition().equals(marker.getPosition());
+                return same;
+            });
+            this.setMap(null)
+            recalculatePostalCodesList();
+        })
+
         var markerStructure = {
             marker: marker,
             radius: $('#radiusInput').val(),
