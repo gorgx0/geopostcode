@@ -87,13 +87,16 @@ function initMap() {
                 postCodes : new Array()
             };
             markers.push(markerStructure);
+            markerStructure.postCodes = [];
             findPostalCode(markerStructure);
+            recalculatePostalCodesList();
         });
 
         markerCircle.addListener('radius_changed',function () {
             markerStructure = _.find(markers, function (i) {
                 return i.markerCircle.center.equals(markerCircle.center);
             });
+            markerStructure.postCodes = [];
             findPostalCode(markerStructure);
             recalculatePostalCodesList();
         })
@@ -104,6 +107,7 @@ function initMap() {
         };
         markers.push(markerStructure);
         findPostalCode(markerStructure);
+        recalculatePostalCodesList();
     })
 }
 
