@@ -53,7 +53,8 @@ function initMap() {
         var marker = new google.maps.Marker({
             position: e.latLng,
             map: map,
-            title: 'r='+$('#radiusInput').val()+' m'
+            title: 'r='+$('#radiusInput').val()+' m',
+            draggable: true
         });
         marker.addListener("click", function (e) {
             console.log("Marker clicked: ")
@@ -61,8 +62,27 @@ function initMap() {
                 let same = markerStructure.marker.getPosition().equals(marker.getPosition());
                 return same;
             });
-            this.setMap(null)
+            this.setMap(null);
             recalculatePostalCodesList();
+        });
+
+        marker.addListener('dragstart',function (e) {
+            console.log('Marker drag started')
+            markers = _.reject(markers, function (markerStructure) {
+                let same = markerStructure.marker.getPosition().equals(marker.getPosition());
+                return same;
+            });
+        });
+
+        marker.addListener('dragend', function (e) {
+            console.log('Marker drag ended')
+            var markerStructure = {
+                marker: marker,
+                radius: $('#radiusInput').val(),
+                postCodes : new Array()
+            }
+            markers.push(markerStructure)
+            findPostalCode(markerStructure)
         })
 
         var markerStructure = {
