@@ -1,5 +1,6 @@
 var map;
 var markers = new Array();
+
 function recalculatePostalCodesList() {
     var postCodes = new Array();
     console.log('--- recalculatePostalCodesList ---');
@@ -18,17 +19,23 @@ function recalculatePostalCodesList() {
     })
 }
 
+function removeMarkerByCircle(circle) {
+    markers = _.reject(markers, function (markerStructure) {
+        return  markerStructure.markerCircle.getCenter().equals(circle.getCenter());
+    });
+}
+
 function findPostalCode(markerStructure) {
     console.log('find postal code for position');
-    radius = parseInt($('#radiusInput').val());
+    radius = markerStructure.markerCircle.radius;
     $.get(
         'http://api.geonames.org/findNearbyPostalCodesJSON',
         {
             username: 'gorgx0',
             radius: radius/1000 ,
             maxRows: 20,
-            lat: markerStructure.marker.position.lat(),
-            lng: markerStructure.marker.position.lng()
+            lat: markerStructure.markerCircle.getCenter().lat(),
+            lng: markerStructure.markerCircle.getCenter().lng()
         },
         function (data,status,jqXHRobj) {
             console.log('--- geoname results ---');
@@ -52,42 +59,47 @@ function initMap() {
         draggableCursor: 'pointer'
     });
     map.addListener('click', function (e) {
-        var marker = new google.maps.Marker({
-            position: e.latLng,
-            map: map,
-            title: 'r='+$('#radiusInput').val()+' m',
-            draggable: true
+        var markerCircle = new google.maps.Circle({
+            map:map,
+            center: e.latLng,
+            radius: parseInt($('#radiusInput').val()),
+            draggable:true,
+            editable: true,
+            fillColor: '#BC79B6',
+            strokeWeight: 1,
+            strokeColor: '#895883'
         });
-        marker.addListener("click", function () {
-            console.log("Marker clicked: ");
-            markers = _.reject(markers, function (markerStructure) {
-                return  markerStructure.marker.getPosition().equals(marker.getPosition());
-            });
-            this.setMap(null);
+
+        markerCircle.addListener('click',function () {
+            removeMarkerByCircle(markerCircle);
+            markerCircle.setMap(null);
             recalculatePostalCodesList();
         });
 
-        marker.addListener('dragstart',function () {
-            console.log('Marker drag started');
-            markers = _.reject(markers, function (markerStructure) {
-                return markerStructure.marker.getPosition().equals(marker.getPosition());
-            });
+
+        markerCircle.addListener('dragstart',function () {
+            removeMarkerByCircle(markerCircle)
         });
 
-        marker.addListener('dragend', function () {
-            console.log('Marker drag ended');
+        markerCircle.addListener('dragend', function () {
             var markerStructure = {
-                marker: marker,
-                radius: $('#radiusInput').val(),
+                markerCircle: markerCircle,
                 postCodes : new Array()
             };
             markers.push(markerStructure);
             findPostalCode(markerStructure);
         });
 
+        markerCircle.addListener('radius_changed',function () {
+            markerStructure = _.find(markers, function (i) {
+                return i.markerCircle.center.equals(markerCircle.center);
+            });
+            findPostalCode(markerStructure);
+            recalculatePostalCodesList();
+        })
+
         var markerStructure = {
-            marker: marker,
-            radius: $('#radiusInput').val(),
+            markerCircle: markerCircle,
             postCodes : new Array()
         };
         markers.push(markerStructure);
