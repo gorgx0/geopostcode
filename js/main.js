@@ -1,24 +1,24 @@
 var map;
 var markers = new Array();
 function recalculatePostalCodesList() {
-    var postCodes = new Array()
-    console.log('--- recalculatePostalCodesList ---')
+    var postCodes = new Array();
+    console.log('--- recalculatePostalCodesList ---');
     markers.forEach(function (markerStructure) {
-        console.log(markerStructure.postCodes)
+        console.log(markerStructure.postCodes);
         markerStructure.postCodes.forEach(function (postalCode) {
             if(!_.contains(postCodes, postalCode)){
                 postCodes.push(postalCode)
             }
         })
-    })
-    $('#codesListContainerList').empty()
+    });
+    $('#codesListContainerList').empty();
     postCodes.forEach(function (postCode) {
         $('#codesListContainerList').append('<li>'+postCode+'</li>')
     })
 }
 
 function findPostalCode(markerStructure) {
-    console.log('find postal code for position')
+    console.log('find postal code for position');
     radius = parseInt($('#radiusInput').val());
     $.get(
         'http://api.geonames.org/findNearbyPostalCodesJSON',
@@ -33,9 +33,9 @@ function findPostalCode(markerStructure) {
             console.log('--- geoname results ---');
             console.log(data);
             data.postalCodes.forEach(function (postalCodeItem) {
-                console.log(postalCodeItem.postalCode)
+                console.log(postalCodeItem.postalCode);
                 markerStructure.postCodes.push(postalCodeItem.postalCode)
-            })
+            });
             console.log(status);
             console.log(jqXHRobj);
             recalculatePostalCodesList()
@@ -43,6 +43,7 @@ function findPostalCode(markerStructure) {
 );
 }
 
+// noinspection JSUnusedGlobalSymbols
 function initMap() {
     map = new google.maps.Map(document.getElementById('map_canvas'), {
         center: {lat: 52.2304, lng: 21.0116},
@@ -56,54 +57,52 @@ function initMap() {
             title: 'r='+$('#radiusInput').val()+' m',
             draggable: true
         });
-        marker.addListener("click", function (e) {
-            console.log("Marker clicked: ")
+        marker.addListener("click", function () {
+            console.log("Marker clicked: ");
             markers = _.reject(markers, function (markerStructure) {
-                let same = markerStructure.marker.getPosition().equals(marker.getPosition());
-                return same;
+                return  markerStructure.marker.getPosition().equals(marker.getPosition());
             });
             this.setMap(null);
             recalculatePostalCodesList();
         });
 
-        marker.addListener('dragstart',function (e) {
-            console.log('Marker drag started')
+        marker.addListener('dragstart',function () {
+            console.log('Marker drag started');
             markers = _.reject(markers, function (markerStructure) {
-                let same = markerStructure.marker.getPosition().equals(marker.getPosition());
-                return same;
+                return markerStructure.marker.getPosition().equals(marker.getPosition());
             });
         });
 
-        marker.addListener('dragend', function (e) {
-            console.log('Marker drag ended')
+        marker.addListener('dragend', function () {
+            console.log('Marker drag ended');
             var markerStructure = {
                 marker: marker,
                 radius: $('#radiusInput').val(),
                 postCodes : new Array()
-            }
-            markers.push(markerStructure)
-            findPostalCode(markerStructure)
-        })
+            };
+            markers.push(markerStructure);
+            findPostalCode(markerStructure);
+        });
 
         var markerStructure = {
             marker: marker,
             radius: $('#radiusInput').val(),
             postCodes : new Array()
-        }
-        markers.push(markerStructure)
-        findPostalCode(markerStructure)
+        };
+        markers.push(markerStructure);
+        findPostalCode(markerStructure);
     })
 }
 
 $(function () {
-    $('#radiusInput').keyup(function (e) {
-        radiusVal = $('#radiusInput').val()
-        radius = Number(radiusVal)
+    $('#radiusInput').keyup(function () {
+        radiusVal = $('#radiusInput').val();
+        radius = Number(radiusVal);
         if(isNaN(radius)) {
-            $('#radiusInput').addClass('validationError')
+            $('#radiusInput').addClass('validationError');
         }else{
-            $('#radiusInput').removeClass('validationError')
+            $('#radiusInput').removeClass('validationError');
         }
     });
 
-})
+});
