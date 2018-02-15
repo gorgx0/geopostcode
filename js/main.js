@@ -12,6 +12,7 @@ function recalculatePostalCodesList() {
         })
     });
     $('#codesListContainerList').empty();
+    postCodes.sort();
     postCodes.forEach(function (postCode) {
         $('#codesListContainerList').append('<li>'+postCode+'</li>')
     })
