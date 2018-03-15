@@ -29,7 +29,7 @@ function findPostalCode(markerStructure) {
     console.log('find postal code for position');
     radius = markerStructure.markerCircle.radius;
     $.get(
-        'http://api.geonames.org/findNearbyPostalCodesJSON',
+        'https://secure.geonames.org/findNearbyPostalCodesJSON',
         {
             username: 'gorgx0',
             radius: radius/1000 ,
